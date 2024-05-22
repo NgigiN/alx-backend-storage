@@ -1,10 +1,7 @@
 -- This script should list all bands with Glam Rock
 -- their main style, ranked by longetivity
 SELECT band_name,
-  CASE
-    WHEN split IS NULL THEN '2022' - formed
-    ELSE split - formed
-  END AS lifespan
+  (IFNULL(split, '2020') - formed) AS lifespan
 FROM metal_bands
-where style = 'Glam rock'
+WHERE FIND_IN_SET('Glam rock', IFNULL(style, "")) > 0
 ORDER BY lifespan DESC;
