@@ -1,0 +1,2 @@
+// This script lists all documents matching the description
+db.school.find({name: "Holberton school"}).forEach(printjson);
