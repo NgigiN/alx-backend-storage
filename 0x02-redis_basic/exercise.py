@@ -38,6 +38,9 @@ def call_history(method: Callable) -> Callable:
 
 
 class Cache:
+    """This is a class which stores a cache of information
+    passed to functions"""
+
     def __init__(self):
         self._redis = redis.Redis()
         self._redis.flushdb()
