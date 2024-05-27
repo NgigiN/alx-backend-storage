@@ -9,6 +9,10 @@ from functools import wraps
 
 
 def count_calls(method: Callable) -> Callable:
+    """ This is a decorator that takes a single method and
+    returns a callable.
+    It increments the count for a kay everytime a method is
+    called"""
     @wraps(method)
     def wrapper(self, *args, **kwargs):
         key = method.__qualname__
