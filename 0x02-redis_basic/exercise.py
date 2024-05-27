@@ -9,10 +9,8 @@ from functools import wraps
 
 
 def count_calls(method: Callable) -> Callable:
-    """ This is a decorator that takes a single method and
-    returns a callable.
-    It increments the count for a kay everytime a method is
-    called"""
+    """Decorator that increments a counter each
+     time the decorated method is called."""
     @wraps(method)
     def wrapper(self, *args, **kwargs):
         key = method.__qualname__
@@ -22,8 +20,9 @@ def count_calls(method: Callable) -> Callable:
 
 
 def call_history(method: Callable) -> Callable:
-    """This function stores the history of inputs and outputs for
-    a particular function"""
+    """Decorator that stores the history of inputs
+       and outputs for a function."""
+    @wraps(method)
     @wraps(method)
     def wrapper(self, *args, **kwargs):
         input_key = "{}:inputs".format(method.__qualname__)
@@ -38,21 +37,23 @@ def call_history(method: Callable) -> Callable:
 
 
 class Cache:
-    """This is a class which stores a cache of information
-    passed to functions"""
+    """A class for storing cache information."""
 
     def __init__(self):
+        """Initializes a Cache object with a Redis instance."""
         self._redis = redis.Redis()
         self._redis.flushdb()
 
     @call_history
     def store(self, data: Union[str, bytes, int, float]) -> str:
+        """Stores data in Redis and returns a key."""
         key = str(uuid.uuid4())
         self._redis.set(key, data)
         return key
 
     def get(self, key: str, fn: Callable = None) -> Union[str,
                                                           bytes, int, None]:
+        """Retrieves data from Redis using the given key."""
         data = self._redis.get(key)
         if data is None:
             return None
@@ -61,13 +62,16 @@ class Cache:
         return data
 
     def get_str(self, key: str) -> Union[str, None]:
+        """Retrieves a string from Redis using the given key."""
         return self.get(key, fn=lambda d: d.decode("utf-8"))
 
     def get_int(self, key: str) -> Union[int, None]:
+        """Retrieves an integer from Redis using the given key."""
         return self.get(key, fn=int)
 
 
 def replay(func: Callable):
+    """Displays the history of calls for a function."""
     input_key = "{}:inputs".format(func.__qualname__)
     output_key = "{}:outputs".format(func.__qualname__)
 
