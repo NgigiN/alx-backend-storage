@@ -70,15 +70,15 @@ class Cache:
         return self.get(key, fn=int)
 
 
-def replay(func: Callable):
+def replay(cache_cls: Cache):
     """Displays the history of calls for a function."""
-    input_key = "{}:inputs".format(func.__qualname__)
-    output_key = "{}:outputs".format(func.__qualname__)
+    input_key = "{}:inputs".format(cache_cls.store.__qualname__)
+    output_key = "{}:outputs".format(cache_cls.store.__qualname__)
 
-    inputs = func._redis.lrange(input_key, 0, -1)
-    outputs = func._redis.lrange(output_key, 0, -1)
+    inputs = cache_cls._redis.lrange(input_key, 0, -1)
+    outputs = cache_cls._redis.lrange(output_key, 0, -1)
 
-    print(f"{func.__qualname__} was called {len(inputs)} times:")
+    print(f"{cache_cls.store.__qualname__} was called {len(inputs)} times:")
     for args, output in zip(inputs, outputs):
         args = eval(args.decode())
-        print(f"{func.__qualname__}(*{args}) -> {output.decode()}")
+        print(f"{cache_cls.store.__qualname__}(*{args}) -> {output.decode()}")
