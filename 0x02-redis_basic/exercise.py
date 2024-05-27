@@ -5,7 +5,7 @@
 import redis
 import uuid
 from typing import Union, Callable
-from functools import cache, wraps
+from functools import wraps
 
 
 def count_calls(method: Callable) -> Callable:
@@ -42,7 +42,8 @@ class Cache:
         self._redis.set(key, data)
         return key
 
-    def get(self, key: str, fn: Callable = None) -> Union[str, bytes, int, None]:
+    def get(self, key: str, fn: Callable = None) -> Union[str,
+                                                          bytes, int, None]:
         data = self._redis.get(key)
         if data is None:
             return None
@@ -61,8 +62,8 @@ def replay(func: Callable):
     input_key = "{}:inputs".format(func.__qualname__)
     output_key = "{}:outputs".format(func.__qualname__)
 
-    inputs = cache._redis.lrange(input_key, 0, -1)
-    outputs = cache._redis.lrange(output_key, 0, -1)
+    inputs = func._redis.lrange(input_key, 0, -1)
+    outputs = func._redis.lrange(output_key, 0, -1)
 
     print(f"{func.__qualname__} was called {len(inputs)} times:")
     for args, output in zip(inputs, outputs):
